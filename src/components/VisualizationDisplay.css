@@ -1,0 +1,187 @@
+/* src/components/VisualizationDisplay.css */
+
+.visualization-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.vis-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.vis-header h2 {
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.vis-header p {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.control-buttons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.control-buttons button {
+    padding: 8px 15px;
+    font-size: 15px;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    background-color: white;
+    color: #007bff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.control-buttons button:hover {
+    background-color: #e6f2ff;
+}
+
+.control-buttons button:disabled {
+    border-color: #ccc;
+    color: #999;
+    cursor: not-allowed;
+    background-color: #f8f8f8;
+}
+
+.step-label {
+    font-weight: bold;
+    font-size: 1.1em;
+    min-width: 70px;
+    text-align: center;
+}
+
+.autoplay-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.autoplay-checkbox input {
+    transform: scale(1.2);
+}
+
+.frames-grid-container {
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    min-width: 600px; /* Ensure enough space */
+    overflow-x: auto; /* Allow horizontal scrolling if many pages */
+}
+
+.frames-grid {
+    display: grid;
+    /* First column for frame labels, subsequent columns for each page reference step */
+    grid-template-columns: 80px repeat(var(--num-pages), 60px); /* 80px for frame labels, 60px for each step */
+    grid-auto-rows: 40px; /* Height of header and frames */
+    gap: 2px;
+    padding-bottom: 5px; /* Space if needed */
+    justify-content: start; /* Align content to the start (left) */
+}
+
+/* Header row cells */
+.grid-header-cell {
+    background-color: #e0e0e0;
+    font-weight: bold;
+    text-align: center;
+    line-height: 40px; /* Vertically align text */
+    border: 1px solid #bbb;
+    box-sizing: border-box;
+}
+
+/* Top-left empty corner cell */
+.grid-header-cell.empty-corner {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+/* Frame label column cells */
+.grid-header-cell.frame-label-col {
+    background-color: #e0e0e0; /* Match other header cells */
+    border-right: 2px solid #999; /* Stronger right border to separate from grid */
+}
+
+/* Highlight current page being referenced in the header row */
+.grid-header-cell.current-page-cell {
+    background-color: #ffd700; /* Gold */
+    border: 2px solid #ffaa00;
+    z-index: 10; /* Bring to front */
+}
+
+/* Cells that represent actual page frames */
+.grid-cell {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1em;
+    position: relative; /* For ref bit/pointer */
+    box-sizing: border-box;
+    transition: background-color 0.3s ease; /* Smooth transition for fault/hit */
+}
+
+/* Page numbers inside frames */
+.grid-cell span {
+    z-index: 1; /* Ensure text is above background elements */
+    color: #333;
+}
+
+/* Ref bit for Clock algorithm */
+.ref-bit {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 0.7em;
+    padding: 1px 3px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border-radius: 3px;
+    z-index: 2;
+}
+
+/* Pointer for Clock algorithm */
+.pointer-indicator {
+    position: absolute;
+    left: -20px; /* Adjust as needed to be outside the cell */
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2em;
+    color: #007bff; /* Blue for pointer */
+    z-index: 3;
+}
+
+/* Page fault highlight */
+.grid-cell.fault {
+    background-color: #ffcccc !important; /* Red for page fault */
+    border: 2px solid #ff0000 !important;
+}
+
+/* Page hit highlight */
+.grid-cell.hit {
+    background-color: #ccffcc !important; /* Green for page hit */
+    border: 2px solid #00cc00 !important;
+}
+
+.status-info {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 600px;
+    margin-top: 15px;
+    padding: 10px 20px;
+    border-top: 1px solid #eee;
+    font-size: 1.1em;
+    color: #333;
+}
