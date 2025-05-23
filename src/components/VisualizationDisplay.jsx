@@ -15,7 +15,7 @@ const VisualizationDisplay = ({ simulationData, currentStep, setCurrentStep, aut
     }
 
     const {
-        algorithmName, pages, frameSize, prefetch,
+        algorithmName, pages, frameSize,
         history, faultHistory, pointerHistory, refBitsHistory, algoHistory
     } = simulationData;
 
@@ -70,7 +70,7 @@ const VisualizationDisplay = ({ simulationData, currentStep, setCurrentStep, aut
         <div className="visualization-container">
             <div className="vis-header">
                 <h2>{algorithmName} Algorithm Visualization</h2>
-                <p>Frame Size: {frameSize}, Prefetching: {prefetch ? 'Enabled' : 'Disabled'}</p>
+                <p>Frame Size: {frameSize}</p>
                 {isAdaptive && <p>Algorithm in use: {currentAlgo}</p>}
             </div>
 

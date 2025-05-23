@@ -5,7 +5,7 @@ const SetupForm = ({
     pageString, setPageString,
     frameSize, setFrameSize,
     selectedAlgorithm, setSelectedAlgorithm,
-    prefetchEnabled, setPrefetchEnabled,
+    // Prefetching removed
     numRandomPages, setNumRandomPages,
     pageRange, setPageRange,
     onRunSimulation, onCompareAll
@@ -62,14 +62,7 @@ const SetupForm = ({
                         ))}
                     </select>
                 </div>
-                <div className="form-row">
-                    <label>Enable Prefetching:</label>
-                    <input
-                        type="checkbox"
-                        checked={prefetchEnabled}
-                        onChange={(e) => setPrefetchEnabled(e.target.checked)}
-                    />
-                </div>
+                {/* Enable Prefetching removed */}
             </div>
 
             <div className="form-section">

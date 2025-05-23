@@ -14,7 +14,7 @@ const App = () => {
     const [pageString, setPageString] = useState("1,2,3,4,1,2,5,1,2,3,4,5");
     const [frameSize, setFrameSize] = useState(3);
     const [selectedAlgorithm, setSelectedAlgorithm] = useState("FIFO");
-    const [prefetchEnabled, setPrefetchEnabled] = useState(false);
+    // Prefetching removed
     const [numRandomPages, setNumRandomPages] = useState(12);
     const [pageRange, setPageRange] = useState(10);
 
@@ -43,7 +43,7 @@ const App = () => {
                 return;
             }
 
-            const result = runSingleSimulation(selectedAlgorithm, pages, frameSize, prefetchEnabled);
+            const result = runSingleSimulation(selectedAlgorithm, pages, frameSize);
             setSimulationData(result);
             setCurrentStep(0); // Reset visualization to start
             setAutoPlay(false); // Ensure autoplay is off initially or when new simulation starts
@@ -62,7 +62,7 @@ const App = () => {
                 return;
             }
 
-            const results = compareAllAlgorithms(pages, frameSize, prefetchEnabled);
+            const results = compareAllAlgorithms(pages, frameSize);
             setComparisonResults(results);
             setActiveTab('comparison'); // Switch to comparison tab
         } catch (error) {
@@ -99,7 +99,6 @@ const App = () => {
                     pageString={pageString} setPageString={setPageString}
                     frameSize={frameSize} setFrameSize={setFrameSize}
                     selectedAlgorithm={selectedAlgorithm} setSelectedAlgorithm={setSelectedAlgorithm}
-                    prefetchEnabled={prefetchEnabled} setPrefetchEnabled={setPrefetchEnabled}
                     numRandomPages={numRandomPages} setNumRandomPages={setNumRandomPages}
                     pageRange={pageRange} setPageRange={setPageRange}
                     onRunSimulation={handleRunSimulation}
@@ -126,7 +125,6 @@ const App = () => {
                         comparisonResults={comparisonResults}
                         pageString={pageString} // Pass parameters used for comparison
                         frameSize={frameSize}
-                        prefetchEnabled={prefetchEnabled}
                     />
                 </div>
             </div>

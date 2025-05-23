@@ -1,7 +1,7 @@
 // src/components/ComparisonTextResults.js
 import React from 'react';
 
-const ComparisonTextResults = ({ comparisonResults, pageString, frameSize, prefetchEnabled }) => {
+const ComparisonTextResults = ({ comparisonResults, pageString, frameSize }) => {
     if (!comparisonResults || Object.keys(comparisonResults).length === 0) {
         return null; // Don't render if no results
     }
@@ -21,7 +21,6 @@ const ComparisonTextResults = ({ comparisonResults, pageString, frameSize, prefe
 - Page Reference String: [${displayedPageString}]
 - Number of Pages: ${pages.length}
 - Frame Size: ${frameSize}
-- Prefetching: ${prefetchEnabled ? 'Enabled' : 'Disabled'}
 
 Results:
 ${'Algorithm'.padEnd(15)} ${'Page Faults'.padEnd(15)} ${'Fault Rate'.padEnd(15)}

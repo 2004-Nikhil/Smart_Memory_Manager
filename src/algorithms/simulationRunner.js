@@ -19,10 +19,10 @@ const algorithmsMap = {
  * @param {string} algorithmName - The name of the algorithm to run.
  * @param {number[]} pages - The page reference string.
  * @param {number} frameSize - The number of frames available.
- * @param {boolean} prefetch - Whether prefetching is enabled.
+// Prefetching removed
  * @returns {object} - Simulation history and final statistics.
  */
-export const runSingleSimulation = (algorithmName, pages, frameSize, prefetch) => {
+export const runSingleSimulation = (algorithmName, pages, frameSize) => {
     const AlgoClass = algorithmsMap[algorithmName];
     if (!AlgoClass) {
         throw new Error(`Algorithm '${algorithmName}' not found.`);
@@ -41,14 +41,7 @@ export const runSingleSimulation = (algorithmName, pages, frameSize, prefetch) =
             faults++;
         }
 
-        // Handle prefetch (if enabled and next page exists)
-        // Python's run_algorithm calls algo_obj.step for prefetch, and counts fault if it returns true.
-        if (prefetch && i + 1 < pages.length) {
-            const nextPage = pages[i + 1];
-            if (algoObj.step(nextPage, frames, frameSize)) { // If prefetch causes a fault, count it
-                faults++;
-            }
-        }
+        // Prefetching logic removed
     }
 
     const historyData = algoObj.getHistory();
@@ -58,7 +51,7 @@ export const runSingleSimulation = (algorithmName, pages, frameSize, prefetch) =
         algorithmName,
         pages,
         frameSize,
-        prefetch,
+        // prefetch removed
         totalFaults: faults,
         history: historyData.history, // Frames state at each step
         faultHistory: historyData.faultHistory, // Page fault status for each original page access
@@ -72,10 +65,10 @@ export const runSingleSimulation = (algorithmName, pages, frameSize, prefetch) =
  * Compares all page replacement algorithms for a given scenario.
  * @param {number[]} pages - The page reference string.
  * @param {number} frameSize - The number of frames available.
- * @param {boolean} prefetch - Whether prefetching is enabled.
+// Prefetching removed
  * @returns {object} - An object where keys are algorithm names and values are their results (faults, faultRate).
  */
-export const compareAllAlgorithms = (pages, frameSize, prefetch) => {
+export const compareAllAlgorithms = (pages, frameSize) => {
     const comparisonResults = {};
 
     for (const algorithmName in algorithmsMap) {
@@ -94,13 +87,7 @@ export const compareAllAlgorithms = (pages, frameSize, prefetch) => {
                 faults++;
             }
 
-            // Handle prefetch (if enabled and next page exists)
-            if (prefetch && i + 1 < pages.length) {
-                const nextPage = pages[i + 1];
-                if (algoObj.step(nextPage, frames, frameSize)) {
-                    faults++;
-                }
-            }
+            // Prefetching logic removed
         }
 
         comparisonResults[algorithmName] = {
