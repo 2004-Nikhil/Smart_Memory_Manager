@@ -1,14 +1,77 @@
-// src/components/VisualizationDisplay.js
-import React, { useEffect, useRef } from 'react';
-import './VisualizationDisplay.css'; // Dedicated CSS for visualization grid structure
+import React, { useEffect, useRef, useState } from 'react';
+import { 
+    Play, 
+    Pause, 
+    SkipBack, 
+    SkipForward, 
+    RotateCcw, 
+    Zap, 
+    Target, 
+    Clock, 
+    Cpu,
+    Activity,
+    TrendingUp,
+    AlertCircle,
+    CheckCircle2
+} from 'lucide-react';
 
 const VisualizationDisplay = ({ simulationData, currentStep, setCurrentStep, autoPlay, setAutoPlay }) => {
+    const [isAnimating, setIsAnimating] = useState(false);
+    const [showStats, setShowStats] = useState(false);
+    
+    // Move useRef to top - before any conditional returns
+    const autoPlayRef = useRef(autoPlay);
+    const timeoutRef = useRef(null);
+
+    // Update ref when autoPlay changes
+    useEffect(() => {
+        autoPlayRef.current = autoPlay;
+    }, [autoPlay]);
+
+    // Move useEffect to top - before any conditional returns
+    useEffect(() => {
+        if (!simulationData || simulationData.history.length === 0) {
+            return;
+        }
+        
+        const totalSteps = simulationData.pages.length;
+        
+        // Clear any existing timeout
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+        }
+        
+        if (autoPlayRef.current && currentStep < totalSteps - 1 && !isAnimating) {
+            setIsAnimating(true);
+            timeoutRef.current = setTimeout(() => {
+                setCurrentStep(prev => prev + 1);
+                setIsAnimating(false);
+            }, 1200);
+        } else if (autoPlayRef.current && currentStep === totalSteps - 1) {
+            setAutoPlay(false);
+            setIsAnimating(false);
+        }
+
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+                timeoutRef.current = null;
+            }
+        };
+    }, [simulationData, currentStep, autoPlay, isAnimating, setCurrentStep, setAutoPlay]);
+
     if (!simulationData || simulationData.history.length === 0) {
         return (
-            <div className="visualization-container">
-                <div className="vis-header">
-                    <h2>Algorithm Visualization</h2>
-                    <p>Run a simulation on the "Setup" tab to see visualization.</p>
+            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-800 flex items-center justify-center p-6">
+                <div className="text-center max-w-md">
+                    <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full flex items-center justify-center border border-purple-500/30">
+                        <Activity size={32} className="text-purple-400" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white mb-4">Algorithm Visualization</h2>
+                    <p className="text-gray-400 leading-relaxed">
+                        Configure and run a simulation in the Setup tab to see the interactive visualization in action.
+                    </p>
                 </div>
             </div>
         );
@@ -31,154 +94,294 @@ const VisualizationDisplay = ({ simulationData, currentStep, setCurrentStep, aut
     const currentAlgo = isAdaptive ? algoHistory[currentStep] : undefined;
 
     const totalFaultsUpToStep = faultHistory.slice(0, currentStep + 1).filter(f => f).length;
-
-    // Use useRef to keep track of autoPlay state across renders for setTimeout
-    const autoPlayRef = useRef(autoPlay);
-    autoPlayRef.current = autoPlay;
-
-    useEffect(() => {
-        let timeoutId;
-        if (autoPlayRef.current && currentStep < totalSteps - 1) {
-            timeoutId = setTimeout(() => {
-                setCurrentStep(prev => prev + 1);
-            }, 1000); // 1 second delay
-        } else if (autoPlayRef.current && currentStep === totalSteps - 1) {
-            // Stop autoplay when it reaches the end
-            setAutoPlay(false);
-        }
-        return () => clearTimeout(timeoutId); // Cleanup on component unmount or state change
-    }, [currentStep, totalSteps, setAutoPlay]);
+    const faultRate = ((totalFaultsUpToStep / (currentStep + 1)) * 100).toFixed(1);
+    const hitRate = (100 - faultRate).toFixed(1);
 
     const handlePrev = () => {
         if (currentStep > 0) {
-            setAutoPlay(false); // Stop autoplay on manual navigation
+            setAutoPlay(false);
+            setIsAnimating(false);
             setCurrentStep(currentStep - 1);
         }
     };
 
     const handleNext = () => {
         if (currentStep < totalSteps - 1) {
-            setAutoPlay(false); // Stop autoplay on manual navigation
+            setAutoPlay(false);
+            setIsAnimating(false);
             setCurrentStep(currentStep + 1);
         }
     };
 
-    // Calculate number of columns needed for the grid: 1 for frame labels + N for pages
-    const numCols = pages.length;
+    const handleAutoPlayToggle = () => {
+        setAutoPlay(!autoPlay);
+        setIsAnimating(false);
+    };
+
+    const getAlgorithmIcon = () => {
+        switch (algorithmName) {
+            case 'Clock': return Clock;
+            case 'LRU': return RotateCcw;
+            case 'Adaptive': return Cpu;
+            default: return Target;
+        }
+    };
+
+    const getAlgorithmColor = () => {
+        switch (algorithmName) {
+            case 'FIFO': return 'from-blue-500 to-cyan-500';
+            case 'LRU': return 'from-purple-500 to-pink-500';
+            case 'Clock': return 'from-green-500 to-emerald-500';
+            case 'Adaptive': return 'from-orange-500 to-red-500';
+            default: return 'from-indigo-500 to-purple-500';
+        }
+    };
+
+    const AlgorithmIcon = getAlgorithmIcon();
 
     return (
-        <div className="visualization-container">
-            <div className="vis-header">
-                <h2>{algorithmName} Algorithm Visualization</h2>
-                <p>Frame Size: {frameSize}</p>
-                {isAdaptive && <p>Algorithm in use: {currentAlgo}</p>}
-            </div>
-
-            <div className="control-buttons">
-                <button onClick={handlePrev} disabled={currentStep === 0}>&lt; Previous</button>
-                <span className="step-label">{currentStep + 1} / {totalSteps}</span>
-                <button onClick={handleNext} disabled={currentStep === totalSteps - 1}>Next &gt;</button>
-                <label className="autoplay-checkbox">
-                    <input
-                        type="checkbox"
-                        checked={autoPlay}
-                        onChange={(e) => setAutoPlay(e.target.checked)}
-                        disabled={currentStep === totalSteps - 1} // Disable if at last step
-                    />
-                    Auto Play
-                </label>
-            </div>
-
-            <div className="frames-grid-container" style={{ '--num-pages': numCols }}>
-                <div className="frames-grid" >
-                    {/* Top-left empty corner cell */}
-                    <div className="grid-header-cell empty-corner" style={{ gridColumn: 1, gridRow: 1 }}></div>
-
-                    {/* Page Reference String Header (Row 1, after the empty corner) */}
-                    {Array.from({ length: numCols }).map((_, colIdx) => (
-                        <div key={`header-${colIdx}`} className="grid-header-cell"
-                            style={{ gridColumn: colIdx + 2, gridRow: 1 }}> {/* +2 because col 1 is for frame labels */}
-                            {pages[colIdx]}
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-800 p-6">
+            <div className="max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="mb-8">
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className={`p-3 rounded-2xl bg-gradient-to-r ${getAlgorithmColor()} shadow-2xl`}>
+                            <AlgorithmIcon size={24} className="text-white" />
                         </div>
-                    ))}
+                        <div>
+                            <h1 className="text-3xl font-bold text-white">
+                                {algorithmName} Algorithm Visualization
+                            </h1>
+                            <p className="text-gray-400">Frame Size: {frameSize} | Simulating {totalSteps} page references</p>
+                        </div>
+                    </div>
+                    
+                    {isAdaptive && (
+                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 border border-orange-500/30 rounded-full text-orange-300">
+                            <Cpu size={16} />
+                            <span>Current Algorithm: {currentAlgo}</span>
+                        </div>
+                    )}
+                </div>
 
-                    {/* Highlight Current Page Being Referenced */}
-                    <div className="grid-header-cell current-page-cell"
-                         style={{ gridColumn: currentStep + 2, gridRow: 1 }}> {/* +2 for same reason */}
-                        {pages[currentStep]}
+                {/* Controls */}
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 mb-8">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <button 
+                                onClick={handlePrev} 
+                                disabled={currentStep === 0}
+                                className="p-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:opacity-50 text-white rounded-xl transition-all duration-200 hover:scale-105 disabled:hover:scale-100"
+                            >
+                                <SkipBack size={20} />
+                            </button>
+                            
+                            <button
+                                onClick={handleAutoPlayToggle}
+                                disabled={currentStep === totalSteps - 1}
+                                className={`p-3 ${autoPlay ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'} disabled:bg-gray-600 disabled:opacity-50 text-white rounded-xl transition-all duration-200 hover:scale-105 disabled:hover:scale-100`}
+                            >
+                                {autoPlay ? <Pause size={20} /> : <Play size={20} />}
+                            </button>
+                            
+                            <button 
+                                onClick={handleNext} 
+                                disabled={currentStep === totalSteps - 1}
+                                className="p-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:opacity-50 text-white rounded-xl transition-all duration-200 hover:scale-105 disabled:hover:scale-100"
+                            >
+                                <SkipForward size={20} />
+                            </button>
+                        </div>
+
+                        <div className="flex items-center gap-6">
+                            <div className="text-white">
+                                <span className="text-2xl font-bold">{currentStep + 1}</span>
+                                <span className="text-gray-400 mx-2">/</span>
+                                <span className="text-gray-400">{totalSteps}</span>
+                            </div>
+                            
+                            <button
+                                onClick={() => setShowStats(!showStats)}
+                                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-all duration-200 hover:scale-105"
+                            >
+                                <TrendingUp size={16} />
+                                Stats
+                            </button>
+                        </div>
                     </div>
 
-                    {/* Frame labels (Column 1, starting from Row 2) */}
-                    {Array.from({ length: frameSize }).map((_, rowIdx) => (
-                        <div key={`frame-label-${rowIdx}`} className="grid-header-cell frame-label-col"
-                            style={{ gridColumn: 1, gridRow: rowIdx + 2 }}> {/* +2 because row 1 is header */}
-                            Frame {rowIdx}
+                    {/* Progress Bar */}
+                    <div className="mt-4">
+                        <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
+                            <div 
+                                className={`h-full bg-gradient-to-r ${getAlgorithmColor()} transition-all duration-300 ease-out`}
+                                style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
+                            />
                         </div>
-                    ))}
-
-                    {/* Frame Contents - This is where the actual visualization happens */}
-                    {/* Iterate through each step to draw all past states up to currentStep */}
-                    {history.slice(0, currentStep + 1).map((framesAtStep, stepIdx) => (
-                        Array.from({ length: frameSize }).map((_, frameIdx) => {
-                            const pageInFrame = framesAtStep[frameIdx];
-                            const isCurrentStep = stepIdx === currentStep;
-                            const isFaultAtThisStep = faultHistory[stepIdx];
-
-                            let cellClass = 'grid-cell';
-                            if (isCurrentStep) {
-                                if (isFaultAtThisStep) {
-                                    cellClass += ' fault';
-                                } else {
-                                    cellClass += ' hit';
-                                }
-                            }
-
-                            // Generate a consistent color for each page number
-                            const pageColorHue = (pageInFrame * 137) % 360; // Use a prime number for better distribution
-                            const backgroundColor = pageInFrame !== undefined
-                                ? `hsl(${pageColorHue}, 70%, 85%)` // Light background for pages
-                                : '#f0f0f0'; // Default for empty frame
-
-                            const borderColor = pageInFrame !== undefined
-                                ? `hsl(${pageColorHue}, 70%, 65%)` // Darker border for pages
-                                : '#ccc';
-
-                            return (
-                                <div
-                                    key={`${stepIdx}-${frameIdx}`}
-                                    className={cellClass}
-                                    style={{
-                                        gridColumn: stepIdx + 2, // Corresponds to the step index + 2 (1 for frame label, 1 for 0-index)
-                                        gridRow: frameIdx + 2, // Corresponds to the frame index + 2 (1 for header, 1 for 0-index)
-                                        backgroundColor: backgroundColor,
-                                        borderColor: borderColor
-                                    }}
-                                >
-                                    {pageInFrame !== undefined && (
-                                        <span>{pageInFrame}</span>
-                                    )}
-
-                                    {/* Clock specific: Pointer and Ref Bit */}
-                                    {isClock && isCurrentStep && frameIdx === currentPointer && (
-                                        <div className="pointer-indicator">
-                                            ↺ {/* Unicode for anti-clockwise arrow (refresh) */}
-                                        </div>
-                                    )}
-                                    {isClock && isCurrentStep && pageInFrame !== undefined && (
-                                        <div className="ref-bit">
-                                            {currentRefBitsAtStep && currentRefBitsAtStep[frameIdx] !== undefined ? currentRefBitsAtStep[frameIdx] : 'N/A'}
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })
-                    ))}
+                    </div>
                 </div>
-            </div>
 
-            <div className="status-info">
-                <span>Status: {currentPageFault ? `Page Fault (Page ${currentPage} not in frames)` : `Page Hit (Page ${currentPage} already in frames)`}</span>
-                <span>Page Faults: {totalFaultsUpToStep}</span>
+                {/* Stats Panel */}
+                {showStats && (
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                        <div className="bg-red-500/20 border border-red-500/30 rounded-xl p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <AlertCircle size={20} className="text-red-400" />
+                                <span className="text-red-400 font-semibold">Page Faults</span>
+                            </div>
+                            <div className="text-2xl font-bold text-white">{totalFaultsUpToStep}</div>
+                            <div className="text-red-300 text-sm">{faultRate}% rate</div>
+                        </div>
+                        
+                        <div className="bg-green-500/20 border border-green-500/30 rounded-xl p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <CheckCircle2 size={20} className="text-green-400" />
+                                <span className="text-green-400 font-semibold">Page Hits</span>
+                            </div>
+                            <div className="text-2xl font-bold text-white">{currentStep + 1 - totalFaultsUpToStep}</div>
+                            <div className="text-green-300 text-sm">{hitRate}% rate</div>
+                        </div>
+                        
+                        <div className="bg-blue-500/20 border border-blue-500/30 rounded-xl p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Activity size={20} className="text-blue-400" />
+                                <span className="text-blue-400 font-semibold">Current Page</span>
+                            </div>
+                            <div className="text-2xl font-bold text-white">{currentPage}</div>
+                            <div className="text-blue-300 text-sm">Step {currentStep + 1}</div>
+                        </div>
+                        
+                        <div className="bg-purple-500/20 border border-purple-500/30 rounded-xl p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Zap size={20} className="text-purple-400" />
+                                <span className="text-purple-400 font-semibold">Efficiency</span>
+                            </div>
+                            <div className="text-2xl font-bold text-white">{hitRate}%</div>
+                            <div className="text-purple-300 text-sm">Hit ratio</div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Visualization Grid */}
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 overflow-x-auto">
+                    <div className="min-w-max">
+                        {/* Page Reference Header */}
+                        <div className="flex items-center mb-4">
+                            <div className="w-20 h-12 flex items-center justify-center text-gray-400 font-semibold">
+                                Pages
+                            </div>
+                            {pages.map((page, idx) => (
+                                <div 
+                                    key={idx}
+                                    className={`w-16 h-12 flex items-center justify-center mx-1 rounded-lg font-bold transition-all duration-300 ${
+                                        idx === currentStep 
+                                            ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white scale-110 shadow-lg' 
+                                            : idx < currentStep 
+                                                ? 'bg-gray-600 text-gray-300' 
+                                                : 'bg-gray-700 text-gray-500'
+                                    }`}
+                                >
+                                    {page}
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Frame Visualization */}
+                        {Array.from({ length: frameSize }).map((_, frameIdx) => (
+                            <div key={frameIdx} className="flex items-center mb-3">
+                                <div className="w-20 h-12 flex items-center justify-center bg-gray-700 text-gray-300 font-semibold rounded-lg mr-1">
+                                    F{frameIdx}
+                                </div>
+                                
+                                {pages.map((_, stepIdx) => {
+                                    const framesAtStep = history[stepIdx];
+                                    const pageInFrame = framesAtStep ? framesAtStep[frameIdx] : undefined;
+                                    const isCurrentStep = stepIdx === currentStep;
+                                    const isFaultAtThisStep = faultHistory[stepIdx];
+                                    const isVisible = stepIdx <= currentStep;
+
+                                    if (!isVisible) {
+                                        return (
+                                            <div 
+                                                key={stepIdx}
+                                                className="w-16 h-12 mx-1 bg-gray-800 border border-gray-600 rounded-lg"
+                                            />
+                                        );
+                                    }
+
+                                    const pageColorHue = pageInFrame !== undefined ? (pageInFrame * 137) % 360 : 0;
+                                    const backgroundColor = pageInFrame !== undefined
+                                        ? `hsl(${pageColorHue}, 70%, 60%)`
+                                        : 'transparent';
+
+                                    return (
+                                        <div 
+                                            key={stepIdx}
+                                            className={`w-16 h-12 mx-1 rounded-lg border-2 flex items-center justify-center font-bold text-white relative transition-all duration-500 ${
+                                                isCurrentStep 
+                                                    ? isFaultAtThisStep 
+                                                        ? 'border-red-500 shadow-lg shadow-red-500/30 scale-105' 
+                                                        : 'border-green-500 shadow-lg shadow-green-500/30 scale-105'
+                                                    : 'border-gray-600'
+                                            } ${isAnimating && isCurrentStep ? 'animate-pulse' : ''}`}
+                                            style={{ backgroundColor }}
+                                        >
+                                            {pageInFrame !== undefined && (
+                                                <span className="relative z-10">{pageInFrame}</span>
+                                            )}
+
+                                            {/* Clock Algorithm Indicators */}
+                                            {isClock && isCurrentStep && frameIdx === currentPointer && (
+                                                <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center text-xs animate-spin">
+                                                    <RotateCcw size={12} />
+                                                </div>
+                                            )}
+                                            
+                                            {isClock && isCurrentStep && pageInFrame !== undefined && currentRefBitsAtStep && (
+                                                <div className="absolute -bottom-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-xs text-white font-bold">
+                                                    {currentRefBitsAtStep[frameIdx] || '0'}
+                                                </div>
+                                            )}
+
+                                            {/* Animation overlay for current step */}
+                                            {isCurrentStep && (
+                                                <div className={`absolute inset-0 rounded-lg animate-pulse ${
+                                                    isFaultAtThisStep ? 'bg-red-500/20' : 'bg-green-500/20'
+                                                }`} />
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Status Display */}
+                <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+                    <div className={`flex items-center gap-3 px-6 py-3 rounded-xl ${
+                        currentPageFault 
+                            ? 'bg-red-500/20 border border-red-500/30' 
+                            : 'bg-green-500/20 border border-green-500/30'
+                    }`}>
+                        {currentPageFault ? (
+                            <AlertCircle size={20} className="text-red-400" />
+                        ) : (
+                            <CheckCircle2 size={20} className="text-green-400" />
+                        )}
+                        <span className={`font-semibold ${currentPageFault ? 'text-red-300' : 'text-green-300'}`}>
+                            {currentPageFault 
+                                ? `Page Fault - Page ${currentPage} not in memory` 
+                                : `Page Hit - Page ${currentPage} found in memory`
+                            }
+                        </span>
+                    </div>
+
+                    <div className="text-gray-400">
+                        Total Faults: <span className="text-red-400 font-bold">{totalFaultsUpToStep}</span> | 
+                        Fault Rate: <span className="text-red-400 font-bold">{faultRate}%</span>
+                    </div>
+                </div>
             </div>
         </div>
     );

@@ -1,5 +1,9 @@
 /* src/App.css */
 /* This file is for App.js specific styling if needed, otherwise most global styles are in index.css */
+/* index.css or App.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 .tab-content.hidden {
     display: none;

@@ -1,5 +1,6 @@
 // src/App.js
 import React, { useState } from 'react';
+import Hero from './components/Hero';
 import SetupForm from './components/SetupForm';
 import VisualizationDisplay from './components/VisualizationDisplay';
 import ComparisonChart from './components/ComparisonChart';
@@ -73,6 +74,7 @@ const App = () => {
 
     return (
         <div className="app-container">
+            <Hero />
             <div className="tabs">
                 <button
                     className={`tab-button ${activeTab === 'setup' ? 'active' : ''}`}
