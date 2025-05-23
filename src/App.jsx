@@ -4,7 +4,6 @@ import Hero from './components/Hero';
 import SetupForm from './components/SetupForm';
 import VisualizationDisplay from './components/VisualizationDisplay';
 import ComparisonChart from './components/ComparisonChart';
-import ComparisonTextResults from './components/ComparisonTextResults';
 import { runSingleSimulation, compareAllAlgorithms } from './algorithms/simulationRunner';
 import './App.css'; // Global App CSS, including tab styles
 
@@ -122,10 +121,7 @@ const App = () => {
                 <div className={`tab-content ${activeTab === 'comparison' ? '' : 'hidden'}`}>
                     <ComparisonChart
                         comparisonResults={comparisonResults}
-                    />
-                    <ComparisonTextResults
-                        comparisonResults={comparisonResults}
-                        pageString={pageString} // Pass parameters used for comparison
+                        pageString={pageString}
                         frameSize={frameSize}
                     />
                 </div>
