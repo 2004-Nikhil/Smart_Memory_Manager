@@ -28,7 +28,7 @@ const VisualizationDisplay = ({ simulationData, currentStep, setCurrentStep, aut
         autoPlayRef.current = autoPlay;
     }, [autoPlay]);
 
-    // Move useEffect to top - before any conditional returns
+    // Simplified useEffect for autoplay - remove problematic dependencies
     useEffect(() => {
         if (!simulationData || simulationData.history.length === 0) {
             return;
@@ -42,15 +42,14 @@ const VisualizationDisplay = ({ simulationData, currentStep, setCurrentStep, aut
             timeoutRef.current = null;
         }
         
-        if (autoPlayRef.current && currentStep < totalSteps - 1 && !isAnimating) {
-            setIsAnimating(true);
+        // Only proceed if autoplay is on and we haven't reached the end
+        if (autoPlay && currentStep < totalSteps - 1) {
             timeoutRef.current = setTimeout(() => {
                 setCurrentStep(prev => prev + 1);
-                setIsAnimating(false);
             }, 1200);
-        } else if (autoPlayRef.current && currentStep === totalSteps - 1) {
+        } else if (autoPlay && currentStep === totalSteps - 1) {
+            // Auto-stop when we reach the end
             setAutoPlay(false);
-            setIsAnimating(false);
         }
 
         return () => {
@@ -59,7 +58,7 @@ const VisualizationDisplay = ({ simulationData, currentStep, setCurrentStep, aut
                 timeoutRef.current = null;
             }
         };
-    }, [simulationData, currentStep, autoPlay, isAnimating, setCurrentStep, setAutoPlay]);
+    }, [simulationData, currentStep, autoPlay, setCurrentStep, setAutoPlay]);
 
     if (!simulationData || simulationData.history.length === 0) {
         return (
@@ -100,7 +99,6 @@ const VisualizationDisplay = ({ simulationData, currentStep, setCurrentStep, aut
     const handlePrev = () => {
         if (currentStep > 0) {
             setAutoPlay(false);
-            setIsAnimating(false);
             setCurrentStep(currentStep - 1);
         }
     };
@@ -108,14 +106,13 @@ const VisualizationDisplay = ({ simulationData, currentStep, setCurrentStep, aut
     const handleNext = () => {
         if (currentStep < totalSteps - 1) {
             setAutoPlay(false);
-            setIsAnimating(false);
             setCurrentStep(currentStep + 1);
         }
     };
 
     const handleAutoPlayToggle = () => {
-        setAutoPlay(!autoPlay);
-        setIsAnimating(false);
+        console.log('Autoplay toggle clicked, current state:', autoPlay); // Debug log
+        setAutoPlay(prev => !prev);
     };
 
     const getAlgorithmIcon = () => {
@@ -180,6 +177,7 @@ const VisualizationDisplay = ({ simulationData, currentStep, setCurrentStep, aut
                                 onClick={handleAutoPlayToggle}
                                 disabled={currentStep === totalSteps - 1}
                                 className={`p-3 ${autoPlay ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'} disabled:bg-gray-600 disabled:opacity-50 text-white rounded-xl transition-all duration-200 hover:scale-105 disabled:hover:scale-100`}
+                                title={autoPlay ? 'Pause autoplay' : 'Start autoplay'}
                             >
                                 {autoPlay ? <Pause size={20} /> : <Play size={20} />}
                             </button>
