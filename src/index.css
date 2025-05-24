@@ -19,6 +19,25 @@ body {
     min-height: 100vh;
 }
 
+/* Global layout fixes for full page coverage */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+#root {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
 /* Enhanced App Container */
 .app-container {
     min-height: 100vh;
@@ -295,6 +314,7 @@ body {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    z-index: 1; /* Ensure buttons are clickable */
 }
 
 .btn-primary:hover {
@@ -309,6 +329,8 @@ body {
 /* Comparison specific styling */
 .comparison-container {
     padding: 20px;
+    position: relative;
+    z-index: 1;
 }
 
 .comparison-container h2 {
@@ -329,30 +351,27 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+    z-index: 1;
 }
 
-.results-text-area {
-    background-color: #f9f9f9;
-    border: 1px solid #eee;
-    border-radius: 10px;
-    padding: 25px;
-    white-space: pre-wrap; /* Preserve formatting */
-    font-family: 'Consolas', 'Monaco', monospace;
-    font-size: 0.95em;
-    color: #333;
-    line-height: 1.7;
-    max-height: 500px; /* Increased max-height for more content */
-    overflow-y: auto;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+/* Ensure all components are properly displayed */
+.component-container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
 }
 
-.results-text-area h3 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    color: #444;
-    font-size: 1.3em;
-    border-bottom: 1px dashed #eee;
-    padding-bottom: 10px;
+/* Remove any potential margin/padding issues */
+.tab-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 /* Responsive Design Improvements */
