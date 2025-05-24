@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, Play, Zap, Target, BarChart3, Cpu, Clock, Brain, Layers } from 'lucide-react';
+import { ChevronDown, Play, Zap, Target, BarChart3, Cpu, Clock, Brain, Layers, ArrowRight, Sparkles } from 'lucide-react';
 
-const Hero = () => {
+const Hero = ({ onStartSimulation }) => {
     const [currentAlgorithm, setCurrentAlgorithm] = useState(0);
     const [isVisible, setIsVisible] = useState(false);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -108,16 +108,28 @@ const Hero = () => {
                     intuitive visual experiences that accelerate learning and understanding.
                 </p>
 
-                {/* CTA Button */}
-                <button 
-                    className={`group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg rounded-full shadow-2xl hover:shadow-purple-500/25 hover:scale-105 transform transition-all duration-300 mb-16 overflow-hidden ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+                {/* Enhanced CTA Buttons */}
+                <div 
+                    className={`flex flex-col sm:flex-row gap-4 mb-16 transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
                     style={{ transitionDelay: '1s' }}
                 >
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <Play size={20} className="relative z-10 group-hover:rotate-12 transition-transform duration-300" />
-                    <span className="relative z-10">Start Simulation</span>
-                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 group-active:opacity-30 transition-opacity duration-150" />
-                </button>
+                    <button 
+                        onClick={onStartSimulation}
+                        className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg rounded-full shadow-2xl hover:shadow-purple-500/25 hover:scale-105 transform transition-all duration-300 overflow-hidden"
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <Play size={20} className="relative z-10 group-hover:rotate-12 transition-transform duration-300" />
+                        <span className="relative z-10">Start Simulation</span>
+                        <ArrowRight size={20} className="relative z-10 group-hover:translate-x-1 transition-transform duration-300" />
+                        <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 group-active:opacity-30 transition-opacity duration-150" />
+                    </button>
+
+                    <button className="group relative inline-flex items-center gap-3 px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold text-lg rounded-full hover:bg-white/20 hover:scale-105 transform transition-all duration-300 overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <Sparkles size={20} className="relative z-10 group-hover:rotate-12 transition-transform duration-300" />
+                        <span className="relative z-10">Learn More</span>
+                    </button>
+                </div>
 
                 {/* Features Grid */}
                 <div 
@@ -144,15 +156,34 @@ const Hero = () => {
                     })}
                 </div>
 
+                {/* Quick Stats */}
+                <div 
+                    className={`grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mb-16 transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+                    style={{ transitionDelay: '1.4s' }}
+                >
+                    {[
+                        { label: 'Algorithms', value: '5+', icon: '🧠' },
+                        { label: 'Visualizations', value: '100%', icon: '📊' },
+                        { label: 'Interactive', value: 'Real-time', icon: '⚡' },
+                        { label: 'Learning', value: 'Enhanced', icon: '🎓' }
+                    ].map((stat, index) => (
+                        <div key={index} className="text-center p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl hover:bg-white/10 transition-all duration-300">
+                            <div className="text-2xl mb-2">{stat.icon}</div>
+                            <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
+                            <div className="text-sm text-gray-400">{stat.label}</div>
+                        </div>
+                    ))}
+                </div>
+
                 {/* Scroll Indicator */}
                 <div 
                     className={`absolute bottom-8 left-1/2 transform -translate-x-1/2 transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
-                    style={{ transitionDelay: '1.4s' }}
+                    style={{ transitionDelay: '1.6s' }}
                 >
-                    <div className="flex flex-col items-center gap-2 text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer">
-                        <span className="text-sm font-medium">Explore More</span>
+                    {/* <div className="flex flex-col items-center gap-2 text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer">
+                        <span className="text-sm font-medium">Explore Features</span>
                         <ChevronDown size={24} className="animate-bounce" />
-                    </div>
+                    </div> */}
                 </div>
             </div>
 

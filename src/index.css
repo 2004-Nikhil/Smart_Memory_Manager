@@ -19,7 +19,12 @@ body {
     min-height: 100vh;
 }
 
+/* Enhanced App Container */
 .app-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
+    position: relative;
+    overflow-x: hidden;
     background-color: #ffffff;
     border-radius: 12px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
@@ -30,34 +35,88 @@ body {
     flex-direction: column;
 }
 
-.tabs {
-    display: flex;
-    border-bottom: 2px solid #e0e0e0;
-    margin-bottom: 25px;
-    justify-content: center;
-}
-
-.tab-button {
-    padding: 15px 25px;
-    cursor: pointer;
-    border: none;
-    background-color: transparent;
-    font-size: 17px;
-    font-weight: 500;
-    color: #666;
+/* Remove the old tabs styling and add new navigation styles */
+.enhanced-navigation {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(20px);
+    background: rgba(15, 23, 42, 0.8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     transition: all 0.3s ease;
-    border-bottom: 3px solid transparent;
-    margin: 0 5px;
 }
 
-.tab-button:hover {
-    color: #007bff;
+.navigation-content {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.tab-button.active {
-    color: #007bff;
-    border-bottom-color: #007bff;
+.brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: white;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.brand-logo:hover {
+    color: #a855f7;
+}
+
+.logo-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    background: linear-gradient(135deg, #9333ea, #ec4899);
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem;
     font-weight: bold;
+}
+
+.tab-navigation {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    padding: 0.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-tab {
+    position: relative;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-tab.active {
+    background: linear-gradient(135deg, #9333ea, #ec4899);
+    color: white;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.nav-tab:not(.active) {
+    color: #9ca3af;
+}
+
+.nav-tab:not(.active):hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 /* Common form styling */
@@ -150,24 +209,101 @@ body {
     transform: none;
 }
 
-/* Tab Content Visibility */
+/* Enhanced Tab Content Transitions */
+.tab-content-container {
+    position: relative;
+    min-height: calc(100vh - 5rem);
+}
+
 .tab-content {
-    animation: fadeIn 0.5s ease-out;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
 }
 
 .tab-content.hidden {
-    display: none;
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    pointer-events: none;
 }
 
-@keyframes fadeIn {
+.tab-content:not(.hidden) {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Page Transition Effects */
+@keyframes slideInUp {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(30px);
     }
     to {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-in-up {
+    animation: slideInUp 0.6s ease-out;
+}
+
+.slide-in-down {
+    animation: slideInDown 0.6s ease-out;
+}
+
+/* Loading States */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Enhanced Button Styles */
+.btn-primary {
+    background: linear-gradient(135deg, #9333ea, #ec4899);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
 }
 
 /* Comparison specific styling */
@@ -217,4 +353,39 @@ body {
     font-size: 1.3em;
     border-bottom: 1px dashed #eee;
     padding-bottom: 10px;
+}
+
+/* Responsive Design Improvements */
+@media (max-width: 768px) {
+    .navigation-content {
+        padding: 0.75rem 1rem;
+    }
+    
+    .tab-navigation {
+        gap: 0.25rem;
+    }
+    
+    .nav-tab {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .brand-logo .brand-text {
+        display: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .tab-navigation {
+        background: none;
+        border: none;
+        padding: 0;
+    }
+    
+    .nav-tab {
+        flex-direction: column;
+        gap: 0.25rem;
+        padding: 0.5rem;
+        min-width: 4rem;
+    }
 }
