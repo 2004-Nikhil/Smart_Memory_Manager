@@ -196,7 +196,7 @@ yarn build
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+We welcome contributions! 
 
 ### Development Setup
 1. Fork the repository
