@@ -174,7 +174,7 @@ const SetupForm = ({
                             <Settings size={24} className="text-white" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold text-white">Simulation Setup</h1>
+                            <h1 className="text-3xl font-bold text-white">Memory Management Setup</h1>
                             <p className="text-gray-400">Configure page replacement algorithm parameters</p>
                         </div>
                     </div>

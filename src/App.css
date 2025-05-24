@@ -4,20 +4,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-.tab-content.hidden {
-    display: none;
-}
-
-.tab-content-wrapper {
-    /* If you want to use flex-column layout for comparison tab's direct children */
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    flex-grow: 1; /* Allows it to take available space */
-}
-
-.tab-content-wrapper > .tab-content {
-    /* Ensure the direct tab-content children within the wrapper take full width */
-    width: 100%;
-}

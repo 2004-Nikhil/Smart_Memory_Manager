@@ -158,11 +158,11 @@ const App = () => {
                             className="flex items-center gap-4 text-white hover:text-purple-400 transition-all duration-300 group"
                         >
                             <div className="w-12 h-12 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-purple-500/25 transition-all duration-300 group-hover:scale-105">
-                                <span className="text-xl font-bold">P</span>
+                                <span className="text-xl font-bold">S</span>
                             </div>
                             <div className="hidden sm:block">
                                 <div className="text-xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
-                                    Page Replacement Simulator
+                                    Smart Memory Manager
                                 </div>
                                 <div className="text-sm text-gray-400 font-medium">Operating Systems Laboratory</div>
                             </div>

@@ -84,9 +84,9 @@ const Hero = ({ onStartSimulation }) => {
                     className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-200 to-cyan-200 mb-3 leading-tight transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
                     style={{ transitionDelay: '0.4s' }}
                 >
-                    <div>Page Replacement</div>
+                    <div>Smart Memory</div>
                     <div className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                        Algorithm Simulator
+                        Management System
                     </div>
                 </h1>
 

@@ -1,4 +1,4 @@
-# Page Replacement Algorithm Simulator 🧠
+# Smart Memory Management 🧠
 
 An interactive web application for visualizing and comparing page replacement algorithms used in operating systems memory management. This educational tool provides real-time visualizations, comprehensive analytics, and side-by-side algorithm comparisons to help students and professionals understand memory management concepts.
 

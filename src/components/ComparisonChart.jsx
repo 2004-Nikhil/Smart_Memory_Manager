@@ -51,9 +51,9 @@ const ComparisonChart = ({ comparisonResults, pageString, frameSize }) => {
                     <div className="w-32 h-32 mx-auto mb-8 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center border border-blue-500/30">
                         <BarChart3 size={48} className="text-blue-400" />
                     </div>
-                    <h2 className="text-3xl font-bold text-white mb-6">Algorithm Comparison</h2>
+                    <h2 className="text-3xl font-bold text-white mb-6">Memory Algorithm Comparison</h2>
                     <p className="text-gray-400 text-lg leading-relaxed mb-8">
-                        Execute "Compare All Algorithms" in the Setup tab to generate comprehensive performance analytics and visualizations.
+                        Execute "Compare All Algorithms" in the Setup tab to generate comprehensive memory management performance analytics and visualizations.
                     </p>
                     <div className="flex justify-center">
                         <div className="px-6 py-3 bg-blue-600/20 border border-blue-500/30 rounded-full text-blue-300 flex items-center gap-2">
@@ -106,7 +106,7 @@ ML-Based    - Simulates machine learning (LRU-like behavior)
 
         return `
 ═══════════════════════════════════════════════════════════
-                PAGE REPLACEMENT ALGORITHM COMPARISON
+                SMART MEMORY MANAGER - ALGORITHM COMPARISON
 ═══════════════════════════════════════════════════════════
 
 Simulation Parameters:
@@ -306,7 +306,7 @@ Generated on: ${new Date().toLocaleString()}
                                 <BarChart3 size={24} className="text-white" />
                             </div>
                             <div>
-                                <h1 className="text-3xl font-bold text-white">Algorithm Performance Comparison</h1>
+                                <h1 className="text-3xl font-bold text-white">Memory Algorithm Performance Comparison</h1>
                                 <p className="text-gray-400">Comprehensive analysis of {algorithms.length} page replacement algorithms</p>
                             </div>
                         </div>
