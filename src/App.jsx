@@ -4,7 +4,7 @@ import Hero from './components/Hero';
 import SetupForm from './components/SetupForm';
 import VisualizationDisplay from './components/VisualizationDisplay';
 import ComparisonChart from './components/ComparisonChart';
-import { runSingleSimulation, compareAllAlgorithms } from './algorithms/simulationRunner';
+import { runSingleSimulation, compareAllAlgorithms, getAvailableAlgorithms, getAlgorithmDescription } from './algorithms/simulationRunner';
 import './App.css'; // Global App CSS, including tab styles
 
 const App = () => {
@@ -19,6 +19,9 @@ const App = () => {
     const [numRandomPages, setNumRandomPages] = useState(12);
     const [pageRange, setPageRange] = useState(10);
 
+    // Get available algorithms dynamically
+    const [availableAlgorithms, setAvailableAlgorithms] = useState([]);
+
     // Visualization States
     const [simulationData, setSimulationData] = useState(null);
     const [currentStep, setCurrentStep] = useState(0);
@@ -26,6 +29,18 @@ const App = () => {
 
     // Comparison States
     const [comparisonResults, setComparisonResults] = useState(null);
+
+    // Load available algorithms on component mount
+    useEffect(() => {
+        try {
+            const algorithms = getAvailableAlgorithms();
+            setAvailableAlgorithms(algorithms);
+        } catch (error) {
+            console.error('Error loading algorithms:', error);
+            // Fallback to basic algorithms
+            setAvailableAlgorithms(['FIFO', 'LRU', 'Clock']);
+        }
+    }, []);
 
     // Navigation handler with smooth transition
     const handleStartSimulation = () => {
@@ -98,6 +113,21 @@ const App = () => {
         }
     };
 
+    // Get algorithm display info
+    const getAlgorithmInfo = (algoName) => {
+        const algorithmStyles = {
+            'FIFO': { icon: '📥', color: 'from-blue-500 to-cyan-500', category: 'Basic' },
+            'LRU': { icon: '🕒', color: 'from-green-500 to-emerald-500', category: 'Basic' },
+            'Clock': { icon: '⏰', color: 'from-yellow-500 to-orange-500', category: 'Basic' },
+            'LFU': { icon: '📊', color: 'from-purple-500 to-pink-500', category: 'Frequency' },
+            'ARC': { icon: '🎯', color: 'from-indigo-500 to-purple-500', category: 'Adaptive' },
+            'LIRS': { icon: '🧠', color: 'from-red-500 to-pink-500', category: 'Advanced' },
+            'Adaptive': { icon: '🔄', color: 'from-teal-500 to-cyan-500', category: 'Adaptive' }
+        };
+        
+        return algorithmStyles[algoName] || { icon: '⚙️', color: 'from-gray-500 to-gray-600', category: 'Other' };
+    };
+
     // Navigation tabs configuration
     const navigationTabs = [
         { id: 'setup', label: 'Setup', icon: '⚙️', description: 'Configure simulation parameters' },
@@ -127,6 +157,12 @@ const App = () => {
                     case 'h':
                         e.preventDefault();
                         handleBackToHome();
+                        break;
+                    case 'Enter':
+                        if (activeTab === 'setup') {
+                            e.preventDefault();
+                            handleRunSimulation();
+                        }
                         break;
                 }
             }
@@ -198,7 +234,7 @@ const App = () => {
 
                         {/* Enhanced Action Controls */}
                         <div className="flex items-center gap-3">
-                            {/* Quick Stats Display */}
+                            {/* Enhanced Quick Stats Display */}
                             <div className="hidden lg:flex items-center gap-4 text-sm text-gray-400 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
                                 <div className="flex items-center gap-2">
                                     <span>📄</span>
@@ -209,9 +245,28 @@ const App = () => {
                                     <span>{frameSize} frames</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <span>⚡</span>
-                                    <span>{selectedAlgorithm}</span>
+                                    <span>{getAlgorithmInfo(selectedAlgorithm).icon}</span>
+                                    <span className="font-medium">{selectedAlgorithm}</span>
+                                    <span className="text-xs px-2 py-1 bg-white/10 rounded-full">
+                                        {getAlgorithmInfo(selectedAlgorithm).category}
+                                    </span>
                                 </div>
+                            </div>
+                            
+                            {/* Algorithm Quick Selector */}
+                            <div className="hidden xl:flex items-center gap-2 bg-white/5 px-3 py-2 rounded-xl border border-white/10">
+                                <span className="text-sm text-gray-400">Algorithm:</span>
+                                <select
+                                    value={selectedAlgorithm}
+                                    onChange={(e) => setSelectedAlgorithm(e.target.value)}
+                                    className="bg-transparent text-white text-sm border-none outline-none cursor-pointer"
+                                >
+                                    {availableAlgorithms.map(algo => (
+                                        <option key={algo} value={algo} className="bg-slate-800 text-white">
+                                            {getAlgorithmInfo(algo).icon} {algo}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             
                             {/* Home Button */}
@@ -237,6 +292,9 @@ const App = () => {
                                 pageString={pageString} setPageString={setPageString}
                                 frameSize={frameSize} setFrameSize={setFrameSize}
                                 selectedAlgorithm={selectedAlgorithm} setSelectedAlgorithm={setSelectedAlgorithm}
+                                availableAlgorithms={availableAlgorithms}
+                                getAlgorithmInfo={getAlgorithmInfo}
+                                getAlgorithmDescription={getAlgorithmDescription}
                                 numRandomPages={numRandomPages} setNumRandomPages={setNumRandomPages}
                                 pageRange={pageRange} setPageRange={setPageRange}
                                 onRunSimulation={handleRunSimulation}
@@ -253,6 +311,7 @@ const App = () => {
                                 setCurrentStep={setCurrentStep}
                                 autoPlay={autoPlay}
                                 setAutoPlay={setAutoPlay}
+                                getAlgorithmInfo={getAlgorithmInfo}
                             />
                         </div>
                     )}
@@ -263,42 +322,65 @@ const App = () => {
                                 comparisonResults={comparisonResults}
                                 pageString={pageString}
                                 frameSize={frameSize}
+                                getAlgorithmInfo={getAlgorithmInfo}
+                                availableAlgorithms={availableAlgorithms}
                             />
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* Floating Action Button for Quick Navigation */}
-            <div className="fixed bottom-8 right-8 z-40">
-                <div className="flex flex-col gap-3">
-                    {/* Quick Action Buttons */}
-                    {activeTab === 'setup' && (
-                        <div className="flex flex-col gap-2">
-                            <button
-                                onClick={handleRunSimulation}
-                                className="w-14 h-14 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center hover:scale-110"
-                                title="Run Simulation (Ctrl+Enter)"
-                            >
-                                <span className="text-xl">▶️</span>
-                            </button>
-                            <button
-                                onClick={handleCompareAll}
-                                className="w-14 h-14 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center hover:scale-110"
-                                title="Compare All Algorithms"
-                            >
-                                <span className="text-xl">📊</span>
-                            </button>
+            {/* Floating Action Button for Quick Navigation - Fixed positioning */}
+            <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+                {/* Quick Action Buttons */}
+                {activeTab === 'setup' && (
+                    <div className="flex flex-col items-end gap-3">
+                        <button
+                            onClick={handleRunSimulation}
+                            className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center hover:scale-110 border-2 border-white/20"
+                            title="Run Simulation (Ctrl+Enter)"
+                        >
+                            <span className="text-2xl">▶️</span>
+                        </button>
+                        <button
+                            onClick={handleCompareAll}
+                            className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center hover:scale-110 border-2 border-white/20"
+                            title="Compare All Algorithms"
+                        >
+                            <span className="text-2xl">📊</span>
+                        </button>
+                    </div>
+                )}
+
+                {/* Algorithm Quick Switch Tooltip - Positioned relative to buttons */}
+                {activeTab === 'setup' && (
+                    <div className="bg-black/80 backdrop-blur-sm text-white text-sm px-4 py-3 rounded-xl border border-white/20 shadow-xl max-w-xs mr-20 relative">
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="text-lg">{getAlgorithmInfo(selectedAlgorithm).icon}</span>
+                            <span className="font-semibold">{selectedAlgorithm}</span>
                         </div>
-                    )}
+                        <div className="text-gray-300 text-xs leading-relaxed">
+                            {getAlgorithmDescription(selectedAlgorithm)}
+                        </div>
+                        {/* Arrow pointing to buttons */}
+                        <div className="absolute top-1/2 -right-2 transform -translate-y-1/2 w-0 h-0 border-l-8 border-l-black/80 border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
+                    </div>
+                )}
+            </div>
+
+            {/* Enhanced Keyboard Shortcuts Indicator - Fixed positioning */}
+            <div className="fixed bottom-6 left-6 z-40 bg-black/80 backdrop-blur-sm text-white text-sm px-4 py-3 rounded-xl border border-white/20 shadow-xl opacity-90 hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-2">
+                    <span className="text-lg">⌨️</span>
+                    <span className="font-medium">Ctrl+1,2,3 for tabs • Ctrl+H for home • Ctrl+Enter to run</span>
                 </div>
             </div>
 
-            {/* Keyboard Shortcuts Indicator */}
-            <div className="fixed bottom-4 left-4 z-30 bg-black/50 backdrop-blur-sm text-white text-xs px-3 py-2 rounded-lg border border-white/10 opacity-75 hover:opacity-100 transition-opacity">
+            {/* Algorithm Count Badge - Fixed positioning */}
+            <div className="fixed top-28 right-6 z-40 bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-sm text-white text-sm px-4 py-2 rounded-full border border-purple-400/30 shadow-lg">
                 <div className="flex items-center gap-2">
-                    <span>⌨️</span>
-                    <span>Ctrl+1,2,3 for tabs • Ctrl+H for home</span>
+                    <span className="text-lg">🧮</span>
+                    <span className="font-medium">{availableAlgorithms.length} algorithms available</span>
                 </div>
             </div>
         </div>

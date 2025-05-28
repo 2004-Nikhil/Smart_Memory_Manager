@@ -18,14 +18,15 @@ import {
     Download,
     Share2,
     FileText,
-    Code,
-    Eye,
     Copy,
     Check,
     Terminal,
     Info,
     ChevronDown,
-    ChevronUp
+    ChevronUp,
+    BarChart2,
+    Sparkles,
+    Network
 } from 'lucide-react';
 
 // Register Chart.js components
@@ -100,8 +101,10 @@ const ComparisonChart = ({ comparisonResults, pageString, frameSize }) => {
 FIFO        - Replaces oldest page
 LRU         - Replaces least recently used page
 Clock       - Second-chance via reference bits
+LFU         - Replaces least frequently used page
+ARC         - Adaptive replacement cache
+LIRS        - Low inter-reference recency set
 Adaptive    - Switches between FIFO/LRU based on pattern
-ML-Based    - Simulates machine learning (LRU-like behavior)
         `.trim();
 
         return `
@@ -147,8 +150,10 @@ Generated on: ${new Date().toLocaleString()}
             case 'FIFO': return Layers;
             case 'LRU': return Clock;
             case 'Clock': return Target;
+            case 'LFU': return BarChart2;
+            case 'ARC': return Sparkles;
+            case 'LIRS': return Network;
             case 'Adaptive': return Cpu;
-            case 'ML-based': return Brain;
             default: return Activity;
         }
     };
@@ -158,10 +163,13 @@ Generated on: ${new Date().toLocaleString()}
             'from-blue-500 to-cyan-500',
             'from-purple-500 to-pink-500',
             'from-green-500 to-emerald-500',
-            'from-orange-500 to-red-500',
-            'from-indigo-500 to-violet-500'
+            'from-purple-500 to-pink-500',
+            'from-indigo-500 to-purple-500',
+            'from-red-500 to-pink-500',
+            'from-orange-500 to-red-500'
         ];
-        return colors[index % colors.length];
+        const algoIndex = ['FIFO', 'LRU', 'Clock', 'LFU', 'ARC', 'LIRS', 'Adaptive'].indexOf(algo);
+        return colors[algoIndex >= 0 ? algoIndex : index % colors.length];
     };
 
     const getAlgorithmBgColor = (algo, index, isWinner = false) => {
@@ -170,10 +178,13 @@ Generated on: ${new Date().toLocaleString()}
             'rgba(59, 130, 246, 0.8)',
             'rgba(147, 51, 234, 0.8)',
             'rgba(34, 197, 94, 0.8)',
-            'rgba(249, 115, 22, 0.8)',
-            'rgba(99, 102, 241, 0.8)'
+            'rgba(147, 51, 234, 0.8)',
+            'rgba(99, 102, 241, 0.8)',
+            'rgba(239, 68, 68, 0.8)',
+            'rgba(249, 115, 22, 0.8)'
         ];
-        return bgColors[index % bgColors.length];
+        const algoIndex = ['FIFO', 'LRU', 'Clock', 'LFU', 'ARC', 'LIRS', 'Adaptive'].indexOf(algo);
+        return bgColors[algoIndex >= 0 ? algoIndex : index % bgColors.length];
     };
 
     const getBorderColor = (algo, index, isWinner = false) => {
@@ -182,10 +193,13 @@ Generated on: ${new Date().toLocaleString()}
             'rgba(59, 130, 246, 1)',
             'rgba(147, 51, 234, 1)',
             'rgba(34, 197, 94, 1)',
-            'rgba(249, 115, 22, 1)',
-            'rgba(99, 102, 241, 1)'
+            'rgba(147, 51, 234, 1)',
+            'rgba(99, 102, 241, 1)',
+            'rgba(239, 68, 68, 1)',
+            'rgba(249, 115, 22, 1)'
         ];
-        return borderColors[index % borderColors.length];
+        const algoIndex = ['FIFO', 'LRU', 'Clock', 'LFU', 'ARC', 'LIRS', 'Adaptive'].indexOf(algo);
+        return borderColors[algoIndex >= 0 ? algoIndex : index % borderColors.length];
     };
 
     const chartData = {

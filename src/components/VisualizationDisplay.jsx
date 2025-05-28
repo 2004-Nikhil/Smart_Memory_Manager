@@ -12,7 +12,12 @@ import {
     Activity,
     TrendingUp,
     AlertCircle,
-    CheckCircle2
+    CheckCircle2,
+    BarChart2,
+    Sparkles,
+    Network,
+    Layers,
+    Brain
 } from 'lucide-react';
 
 const VisualizationDisplay = ({ simulationData, currentStep, setCurrentStep, autoPlay, setAutoPlay }) => {
@@ -117,10 +122,14 @@ const VisualizationDisplay = ({ simulationData, currentStep, setCurrentStep, aut
 
     const getAlgorithmIcon = () => {
         switch (algorithmName) {
-            case 'Clock': return Clock;
-            case 'LRU': return RotateCcw;
+            case 'FIFO': return Layers;
+            case 'LRU': return Clock;
+            case 'Clock': return Target;
+            case 'LFU': return BarChart2;
+            case 'ARC': return Sparkles;
+            case 'LIRS': return Network;
             case 'Adaptive': return Cpu;
-            default: return Target;
+            default: return Activity;
         }
     };
 
@@ -129,6 +138,9 @@ const VisualizationDisplay = ({ simulationData, currentStep, setCurrentStep, aut
             case 'FIFO': return 'from-blue-500 to-cyan-500';
             case 'LRU': return 'from-purple-500 to-pink-500';
             case 'Clock': return 'from-green-500 to-emerald-500';
+            case 'LFU': return 'from-purple-500 to-pink-500';
+            case 'ARC': return 'from-indigo-500 to-purple-500';
+            case 'LIRS': return 'from-red-500 to-pink-500';
             case 'Adaptive': return 'from-orange-500 to-red-500';
             default: return 'from-indigo-500 to-purple-500';
         }

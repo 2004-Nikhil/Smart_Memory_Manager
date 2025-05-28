@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Zap, Target, BarChart3, Cpu, Clock, Brain, Layers, ArrowRight } from 'lucide-react';
+import { Play, Zap, Target, BarChart3, Cpu, Clock, Brain, Layers, ArrowRight, BarChart2, Sparkles, Network } from 'lucide-react';
 
 const Hero = ({ onStartSimulation }) => {
     const [currentAlgorithm, setCurrentAlgorithm] = useState(0);
@@ -7,11 +7,13 @@ const Hero = ({ onStartSimulation }) => {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
     const algorithms = [
-        { name: 'FIFO', color: 'from-blue-500 to-cyan-500', icon: Layers },
-        { name: 'LRU', color: 'from-purple-500 to-pink-500', icon: Clock },
-        { name: 'Clock', color: 'from-green-500 to-emerald-500', icon: Cpu },
-        { name: 'Adaptive', color: 'from-orange-500 to-red-500', icon: Zap },
-        { name: 'ML-based', color: 'from-indigo-500 to-purple-500', icon: Brain }
+        { name: 'FIFO', color: 'from-blue-500 to-cyan-500', icon: Layers, category: 'Basic' },
+        { name: 'LRU', color: 'from-purple-500 to-pink-500', icon: Clock, category: 'Basic' },
+        { name: 'Clock', color: 'from-green-500 to-emerald-500', icon: Cpu, category: 'Basic' },
+        { name: 'LFU', color: 'from-purple-500 to-pink-500', icon: BarChart2, category: 'Frequency' },
+        { name: 'ARC', color: 'from-indigo-500 to-purple-500', icon: Sparkles, category: 'Adaptive' },
+        { name: 'LIRS', color: 'from-red-500 to-pink-500', icon: Network, category: 'Advanced' },
+        { name: 'Adaptive', color: 'from-orange-500 to-red-500', icon: Zap, category: 'Adaptive' }
     ];
 
     useEffect(() => {
@@ -103,7 +105,7 @@ const Hero = ({ onStartSimulation }) => {
                     className={`text-sm sm:text-base text-gray-400 mb-6 max-w-3xl leading-relaxed transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
                     style={{ transitionDelay: '0.8s' }}
                 >
-                    Explore FIFO, LRU, Clock, and ML-based algorithms through interactive visualizations that make complex concepts easy to understand.
+                    Explore FIFO, LRU, Clock, LFU, ARC, LIRS, and Adaptive, algorithms through interactive visualizations that make complex concepts easy to understand.
                 </p>
 
                 {/* CTA Button */}
@@ -153,7 +155,7 @@ const Hero = ({ onStartSimulation }) => {
                     style={{ transitionDelay: '1.4s' }}
                 >
                     {[
-                        { label: 'Algorithms', value: '5+', icon: '🧠' },
+                        { label: 'Algorithms', value: '8+', icon: '🧠' },
                         { label: 'Interactive', value: '100%', icon: '📊' },
                         { label: 'Real-time', value: 'Live', icon: '⚡' },
                         { label: 'Learning', value: 'Enhanced', icon: '🎓' }

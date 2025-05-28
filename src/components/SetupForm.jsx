@@ -24,7 +24,9 @@ import {
     Download,
     Share2,
     Code,
-    TestTube
+    TestTube,
+    BarChart2,
+    Network
 } from 'lucide-react';
 
 const SetupForm = ({
@@ -42,11 +44,13 @@ const SetupForm = ({
     const [generationStats, setGenerationStats] = useState(null);
 
     const algorithms = [
-        { id: "FIFO", name: "FIFO (First In, First Out)", icon: Layers, description: "Replaces the oldest page in memory", color: "from-blue-500 to-cyan-500" },
-        { id: "LRU", name: "LRU (Least Recently Used)", icon: Clock, description: "Replaces the least recently accessed page", color: "from-purple-500 to-pink-500" },
-        { id: "Clock", name: "Clock (Second Chance)", icon: Target, description: "Circular queue with reference bits", color: "from-green-500 to-emerald-500" },
-        { id: "Adaptive", name: "Adaptive Algorithm", icon: Cpu, description: "Switches between FIFO and LRU dynamically", color: "from-orange-500 to-red-500" },
-        { id: "ML-Based", name: "ML-Based Prediction", icon: Brain, description: "Machine learning inspired replacement", color: "from-indigo-500 to-violet-500" }
+        { id: "FIFO", name: "FIFO (First In, First Out)", icon: Layers, description: "Replaces the oldest page in memory", color: "from-blue-500 to-cyan-500", category: "Basic" },
+        { id: "LRU", name: "LRU (Least Recently Used)", icon: Clock, description: "Replaces the least recently accessed page", color: "from-purple-500 to-pink-500", category: "Basic" },
+        { id: "Clock", name: "Clock (Second Chance)", icon: Target, description: "Circular queue with reference bits", color: "from-green-500 to-emerald-500", category: "Basic" },
+        { id: "LFU", name: "LFU (Least Frequently Used)", icon: BarChart2, description: "Replaces the least frequently used page", color: "from-purple-500 to-pink-500", category: "Frequency" },
+        { id: "ARC", name: "ARC (Adaptive Replacement Cache)", icon: Sparkles, description: "Adaptive replacement cache", color: "from-indigo-500 to-purple-500", category: "Adaptive" },
+        { id: "LIRS", name: "LIRS (Low Inter-reference Recency Set)", icon: Network, description: "Low inter-reference recency set", color: "from-red-500 to-pink-500", category: "Advanced" },
+        { id: "Adaptive", name: "Adaptive Algorithm", icon: Cpu, description: "Switches between FIFO and LRU dynamically", color: "from-orange-500 to-red-500", category: "Adaptive" }
     ];
 
     const commonPresets = {
@@ -58,6 +62,7 @@ const SetupForm = ({
     };
 
     useEffect(() => {
+        setPresets(commonPresets);
         validateInputs();
     }, [pageString, frameSize, numRandomPages, pageRange]);
 
@@ -151,7 +156,14 @@ const SetupForm = ({
     };
 
     const getAlgorithmInfo = (algo) => {
-        return algorithms.find(a => a.id === algo);
+        return algorithms.find(a => a.id === algo) || {
+            id: algo,
+            name: algo,
+            icon: Activity,
+            description: "Unknown algorithm",
+            color: "from-gray-500 to-gray-600",
+            category: "Other"
+        };
     };
 
     const copyPageString = async () => {
@@ -325,18 +337,19 @@ const SetupForm = ({
                         </div>
                     </div>
 
-                    {/* Random Generation & Presets */}
-                    <div className="space-y-6">
-                        {/* Random Page Generation */}
+                    {/* Right Column Container */}
+                    <div className="space-y-8">
+                        {/* Random Page Generator */}
                         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
                             <div className="flex items-center gap-3 mb-6">
-                                <div className="p-2 bg-green-600 rounded-lg">
+                                <div className="p-2 bg-purple-600 rounded-lg">
                                     <Shuffle size={20} className="text-white" />
                                 </div>
-                                <h3 className="text-xl font-bold text-white">Random Page Generation</h3>
+                                <h3 className="text-xl font-bold text-white">Random Page Generator</h3>
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-6">
+                                {/* Number of Pages */}
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-300 mb-2">Number of Pages</label>
                                     <input
@@ -345,26 +358,52 @@ const SetupForm = ({
                                         onChange={(e) => setNumRandomPages(Math.max(5, parseInt(e.target.value) || 5))}
                                         min="5"
                                         max="100"
-                                        className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all"
+                                        className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white focus:outline-none focus:ring-2 transition-all ${
+                                            validationErrors.numRandomPages 
+                                                ? 'border-red-500 focus:ring-red-500/50' 
+                                                : 'border-white/20 focus:ring-purple-500/50'
+                                        }`}
                                     />
+                                    {validationErrors.numRandomPages && (
+                                        <div className="flex items-center gap-2 mt-2 text-red-400 text-sm">
+                                            <AlertCircle size={14} />
+                                            <span>{validationErrors.numRandomPages}</span>
+                                        </div>
+                                    )}
                                 </div>
 
+                                {/* Page Range */}
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-300 mb-2">Page Value Range (0 to N-1)</label>
+                                    <label className="block text-sm font-semibold text-gray-300 mb-2">Page Range (0 to N)</label>
                                     <input
                                         type="number"
                                         value={pageRange}
-                                        onChange={(e) => setPageRange(Math.max(1, parseInt(e.target.value) || 10))}
+                                        onChange={(e) => setPageRange(Math.max(1, parseInt(e.target.value) || 1))}
                                         min="1"
                                         max="50"
-                                        className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all"
+                                        className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white focus:outline-none focus:ring-2 transition-all ${
+                                            validationErrors.pageRange 
+                                                ? 'border-red-500 focus:ring-red-500/50' 
+                                                : 'border-white/20 focus:ring-purple-500/50'
+                                        }`}
                                     />
+                                    {validationErrors.pageRange && (
+                                        <div className="flex items-center gap-2 mt-2 text-red-400 text-sm">
+                                            <AlertCircle size={14} />
+                                            <span>{validationErrors.pageRange}</span>
+                                        </div>
+                                    )}
                                 </div>
 
+                                {/* Generate Button */}
                                 <button
                                     onClick={handleGenerateRandomPages}
-                                    disabled={isGenerating}
-                                    className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold rounded-xl transition-all duration-200 hover:scale-105 disabled:scale-100"
+                                    disabled={isGenerating || validationErrors.numRandomPages || validationErrors.pageRange}
+                                    className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold transition-all duration-200 ${
+                                        isGenerating || validationErrors.numRandomPages || validationErrors.pageRange
+                                            ? 'bg-gray-600 cursor-not-allowed'
+                                            : 'bg-purple-600 hover:bg-purple-700 hover:scale-105'
+                                    } text-white`}
                                 >
                                     {isGenerating ? (
                                         <>
@@ -373,114 +412,96 @@ const SetupForm = ({
                                         </>
                                     ) : (
                                         <>
-                                            <Sparkles size={16} />
+                                            <Shuffle size={16} />
                                             Generate Random Pages
                                         </>
                                     )}
                                 </button>
-
-                                {generationStats && (
-                                    <div className="mt-4 p-4 bg-green-500/10 border border-green-500/30 rounded-xl">
-                                        <h4 className="font-semibold text-green-400 mb-2">Generation Statistics</h4>
-                                        <div className="grid grid-cols-2 gap-2 text-sm">
-                                            <div className="text-gray-300">Total Pages: <span className="text-white font-semibold">{generationStats.totalPages}</span></div>
-                                            <div className="text-gray-300">Unique Pages: <span className="text-white font-semibold">{generationStats.uniquePages}</span></div>
-                                            <div className="text-gray-300">Avg Frequency: <span className="text-white font-semibold">{generationStats.avgFrequency}</span></div>
-                                            <div className="text-gray-300">Diversity: <span className="text-white font-semibold">{generationStats.diversity}%</span></div>
-                                            <div className="col-span-2 text-gray-300">Most Frequent: <span className="text-white font-semibold">{generationStats.mostFrequent}</span></div>
-                                        </div>
-                                    </div>
-                                )}
                             </div>
+
+                            {/* Generation Stats */}
+                            {generationStats && (
+                                <div className="mt-6 bg-purple-500/10 border border-purple-500/30 rounded-xl p-4">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <Info size={16} className="text-purple-400" />
+                                        <span className="text-sm font-semibold text-purple-300">Generation Stats</span>
+                                    </div>
+                                    <div className="text-sm text-gray-300 space-y-1">
+                                        <p>Total Pages: {generationStats.totalPages}</p>
+                                        <p>Unique Pages: {generationStats.uniquePages}</p>
+                                        <p>Average Frequency: {generationStats.avgFrequency}</p>
+                                        <p>Most Frequent: {generationStats.mostFrequent}</p>
+                                        <p>Diversity: {generationStats.diversity}%</p>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
-                        {/* Quick Presets */}
+                        {/* Presets */}
                         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="p-2 bg-orange-600 rounded-lg">
-                                    <TestTube size={20} className="text-white" />
+                            <button
+                                onClick={() => setShowPresets(!showPresets)}
+                                className="w-full flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-200"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-indigo-600 rounded-lg">
+                                        <TestTube size={20} className="text-white" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-white">Common Test Presets</h3>
+                                        <p className="text-sm text-gray-400">Pre-configured scenarios for quick testing</p>
+                                    </div>
                                 </div>
-                                <h3 className="text-xl font-bold text-white">Quick Presets</h3>
-                            </div>
+                                <ChevronRight size={20} className={`text-gray-400 transition-transform ${showPresets ? 'rotate-90' : ''}`} />
+                            </button>
 
-                            <div className="grid grid-cols-1 gap-2">
-                                {Object.entries(commonPresets).map(([name, preset]) => (
-                                    <button
-                                        key={name}
-                                        onClick={() => applyPreset(preset)}
-                                        className="p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-orange-500/50 rounded-xl text-left transition-all duration-200 group"
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <div className="font-semibold text-white group-hover:text-orange-400 transition-colors">{name}</div>
-                                                <div className="text-sm text-gray-400">
-                                                    {preset.pageString.length > 30 
-                                                        ? `${preset.pageString.substring(0, 30)}...` 
-                                                        : preset.pageString
-                                                    } • {preset.frameSize} frames
-                                                </div>
+                            {showPresets && (
+                                <div className="mt-4 grid grid-cols-1 gap-4">
+                                    {Object.entries(presets).map(([name, preset]) => (
+                                        <button
+                                            key={name}
+                                            onClick={() => applyPreset(preset)}
+                                            className="p-4 bg-white/5 border border-white/10 rounded-xl text-left hover:bg-white/10 hover:border-white/20 transition-all duration-200"
+                                        >
+                                            <div className="font-semibold text-white">{name}</div>
+                                            <div className="text-sm text-gray-400 mt-1">
+                                                Pages: {preset.pageString.split(',').length} | Frames: {preset.frameSize}
                                             </div>
-                                            <ChevronRight size={16} className="text-gray-400 group-hover:text-orange-400 transition-colors" />
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-wrap gap-4">
                     <button
                         onClick={onRunSimulation}
                         disabled={!isValid}
-                        className="flex-1 flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold text-lg rounded-2xl transition-all duration-200 hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed shadow-lg"
+                        className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
+                            isValid
+                                ? 'bg-green-600 hover:bg-green-700 hover:scale-105'
+                                : 'bg-gray-600 cursor-not-allowed'
+                        } text-white`}
                     >
-                        <Play size={20} />
+                        <Play size={16} />
                         Run Simulation
-                        {!isValid && <AlertCircle size={16} />}
                     </button>
 
                     <button
                         onClick={onCompareAll}
                         disabled={!isValid}
-                        className="flex-1 flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold text-lg rounded-2xl transition-all duration-200 hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed shadow-lg"
+                        className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
+                            isValid
+                                ? 'bg-blue-600 hover:bg-blue-700 hover:scale-105'
+                                : 'bg-gray-600 cursor-not-allowed'
+                        } text-white`}
                     >
-                        <BarChart3 size={20} />
+                        <BarChart3 size={16} />
                         Compare All Algorithms
-                        {!isValid && <AlertCircle size={16} />}
                     </button>
-                </div>
-
-                {/* Help Section */}
-                <div className="mt-8 bg-blue-500/10 border border-blue-500/30 rounded-2xl p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                        <Info size={20} className="text-blue-400" />
-                        <h3 className="text-lg font-semibold text-blue-400">Quick Start Guide</h3>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                        <div className="flex items-start gap-2">
-                            <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</div>
-                            <div>
-                                <div className="font-semibold text-white">Enter Page String</div>
-                                <div className="text-gray-400">Comma-separated page numbers or use presets</div>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-2">
-                            <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</div>
-                            <div>
-                                <div className="font-semibold text-white">Set Frame Size</div>
-                                <div className="text-gray-400">Number of memory frames (1-10)</div>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-2">
-                            <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">3</div>
-                            <div>
-                                <div className="font-semibold text-white">Choose Algorithm</div>
-                                <div className="text-gray-400">Select replacement strategy</div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

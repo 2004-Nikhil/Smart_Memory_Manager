@@ -3,7 +3,9 @@ import FIFO from './FIFO';
 import LRU from './LRU';
 import Clock from './Clock';
 import AdaptiveAlgorithm from './AdaptiveAlgorithm';
-import MLPageReplacement from './MLPageReplacement';
+import LFU from './LFU';
+import ARC from './ARC';
+import LIRS from './LIRS';
 
 // Map algorithm names to their classes
 const algorithmsMap = {
@@ -11,7 +13,9 @@ const algorithmsMap = {
     "LRU": LRU,
     "Clock": Clock,
     "Adaptive": AdaptiveAlgorithm,
-    "ML-Based": MLPageReplacement
+    "LFU": LFU,
+    "ARC": ARC,
+    "LIRS": LIRS
 };
 
 /**
@@ -57,7 +61,16 @@ export const runSingleSimulation = (algorithmName, pages, frameSize) => {
         faultHistory: historyData.faultHistory, // Page fault status for each original page access
         pointerHistory: historyData.pointerHistory || [], // Clock-specific
         refBitsHistory: historyData.refBitsHistory || [], // Clock-specific
-        algoHistory: historyData.algoHistory || [] // Adaptive-specific
+        algoHistory: historyData.algoHistory || [], // Adaptive-specific
+        frequencies: historyData.frequencies || [], // LFU-specific
+        adaptiveParameter: historyData.adaptiveParameter || 0, // ARC-specific
+        T1Size: historyData.T1Size || 0, // ARC-specific
+        T2Size: historyData.T2Size || 0, // ARC-specific
+        B1Size: historyData.B1Size || 0, // ARC-specific
+        B2Size: historyData.B2Size || 0, // ARC-specific
+        LIRCount: historyData.LIRCount || 0, // LIRS-specific
+        HIRCount: historyData.HIRCount || 0, // LIRS-specific
+        stackSize: historyData.stackSize || 0 // LIRS-specific
     };
 };
 
@@ -72,28 +85,65 @@ export const compareAllAlgorithms = (pages, frameSize) => {
     const comparisonResults = {};
 
     for (const algorithmName in algorithmsMap) {
-        // Re-initialize frames and algorithm object for each simulation run
-        const AlgoClass = algorithmsMap[algorithmName];
-        const algoObj = new AlgoClass();
-        const frames = [];
-        let faults = 0;
+        try {
+            // Re-initialize frames and algorithm object for each simulation run
+            const AlgoClass = algorithmsMap[algorithmName];
+            const algoObj = new AlgoClass();
+            const frames = [];
+            let faults = 0;
 
-        for (let i = 0; i < pages.length; i++) {
-            const page = pages[i];
+            for (let i = 0; i < pages.length; i++) {
+                const page = pages[i];
 
-            // Simulate current page access
-            let faultOccurred = algoObj.step(page, frames, frameSize);
-            if (faultOccurred) {
-                faults++;
+                // Simulate current page access
+                let faultOccurred = algoObj.step(page, frames, frameSize);
+                if (faultOccurred) {
+                    faults++;
+                }
+
+                // Prefetching logic removed
             }
 
-            // Prefetching logic removed
+            comparisonResults[algorithmName] = {
+                faults: faults,
+                faultRate: (faults / pages.length) * 100 // Calculate fault rate
+            };
+        } catch (error) {
+            // Handle any algorithm-specific errors
+            console.warn(`Error running ${algorithmName}:`, error);
+            comparisonResults[algorithmName] = {
+                faults: -1,
+                faultRate: -1,
+                error: error.message
+            };
         }
-
-        comparisonResults[algorithmName] = {
-            faults: faults,
-            faultRate: (faults / pages.length) * 100 // Calculate fault rate
-        };
     }
     return comparisonResults;
+};
+
+/**
+ * Get list of available algorithms
+ * @returns {string[]} - Array of algorithm names
+ */
+export const getAvailableAlgorithms = () => {
+    return Object.keys(algorithmsMap);
+};
+
+/**
+ * Get algorithm description
+ * @param {string} algorithmName - The name of the algorithm
+ * @returns {string} - Description of the algorithm
+ */
+export const getAlgorithmDescription = (algorithmName) => {
+    const descriptions = {
+        "FIFO": "First In, First Out - Replaces the oldest page in memory",
+        "LRU": "Least Recently Used - Replaces the page that hasn't been used for the longest time",
+        "Clock": "Clock/Second Chance - Uses reference bits in a circular buffer approach",
+        "Adaptive": "Adaptive Algorithm - Dynamically adjusts between different strategies",
+        "LFU": "Least Frequently Used - Replaces the page with the lowest access frequency",
+        "ARC": "Adaptive Replacement Cache - IBM's algorithm balancing recency and frequency",
+        "LIRS": "Low Inter-reference Recency Set - Advanced algorithm using inter-reference recency"
+    };
+    
+    return descriptions[algorithmName] || "No description available";
 };
